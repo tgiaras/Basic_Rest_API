@@ -34,9 +34,25 @@ class Employees(Resource):
 
         return empsList
 
+    def post(self):
+
+        firstname = request.args['firstname']
+        lastname = request.args['lastname']
+        department = request.args['department']
+
+        toAdd = { 'firstname': firstname, 'lastname': lastname, 'department': department}
+
+        emp.insert_one(toAdd)
+
+        toAdd['_id'] = str(toAdd['_id'])
+
+        return {'status': 'success', 'addedData': toAdd}
+
 
 class Departments(Resource):
+
     def get(self):
+        
         deps = dep.find()
 
         depsList = []
@@ -52,11 +68,26 @@ class Departments(Resource):
 
 
         return depsList
+    
+    def post(self):
+
+        name = request.args['name']
+
+        toAdd = { 'name': name}
+
+        dep.insert_one(toAdd)
+
+        toAdd['_id'] = str(toAdd['_id'])
+
+        return {'status': 'success', 'addedData': toAdd}
         
 
 class Employees_Name(Resource):
+
     def get(self, employee_id):
+
         myquery = { "_id": ObjectId(employee_id) }
+
         emps = emp.find(myquery)
 
         empsList = []
