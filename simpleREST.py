@@ -36,9 +36,9 @@ class Employees(Resource):
 
     def post(self):
 
-        firstname = request.args['firstname']
-        lastname = request.args['lastname']
-        department = request.args['department']
+        firstname = request.json['firstname']
+        lastname = request.json['lastname']
+        department = request.json['department']
 
         toAdd = { 'firstname': firstname, 'lastname': lastname, 'department': department}
 
@@ -49,10 +49,11 @@ class Employees(Resource):
         return {'status': 'success', 'addedData': toAdd}
 
 
+
 class Departments(Resource):
 
     def get(self):
-        
+
         deps = dep.find()
 
         depsList = []
@@ -71,7 +72,7 @@ class Departments(Resource):
     
     def post(self):
 
-        name = request.args['name']
+        name = request.json['name']
 
         toAdd = { 'name': name}
 
@@ -104,11 +105,82 @@ class Employees_Name(Resource):
             empsList.append(empData)
 
         return empsList
-        
+
+    def put(self, employee_id):
+
+        myquery = { "_id": ObjectId(employee_id) }
+
+        emps = emp.find(myquery)
+
+        for employee in emps:
+
+            oldData = employee
+
+        oldData['_id'] = str(oldData['_id'])
+
+        newData = oldData.copy()
+
+        newValues = { "$set": {} }
+
+        for key in request.json:
+
+            newValues['$set'][key] = request.json[key]
+            newData[key] = request.json[key]
+
+        emp.update_one(myquery, newValues)
+
+        return { 'status': 'success', 'oldData': oldData, 'newData': newData}
+
+class Department_Name(Resource):
+
+        def get(self, department_id):
+
+            myquery = { "_id": ObjectId(department_id) }
+
+            deps = dep.find(myquery)
+
+            depsList = []
+
+            for department in deps:
+
+                id = str(department['_id'])
+                name = department['name']
+
+                empData = {'_id': id, 'name': name}
+
+                depsList.append(empData)
+
+            return depsList
+
+        def put(self, department_id):
+
+            myquery = { "_id": ObjectId(department_id) }
+
+            deps = dep.find(myquery)
+
+            for department in deps:
+
+                oldData = department
+
+            oldData['_id'] = str(oldData['_id'])
+
+            newData = oldData.copy()
+
+            newValues = { "$set": {} }
+
+            for key in request.json:
+
+                newValues['$set'][key] = request.json[key]
+                newData[key] = request.json[key]
+
+            dep.update_one(myquery, newValues)
+
+            return { 'status': 'success', 'oldData': oldData, 'newData': newData}
 
 api.add_resource(Employees, '/employees') # Route_1
 api.add_resource(Departments, '/departments') # Route_2
 api.add_resource(Employees_Name, '/employees/<employee_id>') # Route_3
+api.add_resource(Department_Name, '/departments/<department_id>') # Route_4
 
 
 if __name__ == '__main__':
