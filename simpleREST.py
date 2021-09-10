@@ -131,6 +131,22 @@ class Employees_Name(Resource):
 
         return { 'status': 'success', 'oldData': oldData, 'newData': newData}
 
+    def delete(self, employee_id):
+
+        myquery = { "_id": ObjectId(employee_id) }
+
+        emps = emp.find(myquery)
+
+        for employee in emps:
+
+            delData = employee
+        
+        delData['_id'] = str(delData['_id'])
+
+        emp.delete_one(myquery)
+
+        return { 'status': 'success', 'deleted': delData}
+
 class Department_Name(Resource):
 
         def get(self, department_id):
@@ -176,6 +192,23 @@ class Department_Name(Resource):
             dep.update_one(myquery, newValues)
 
             return { 'status': 'success', 'oldData': oldData, 'newData': newData}
+
+        
+        def delete(self, department_id):
+
+            myquery = { "_id": ObjectId(department_id) }
+
+            deps = dep.find(myquery)
+
+            for department in deps:
+
+                delData = department
+            
+            delData['_id'] = str(delData['_id'])
+
+            dep.delete_one(myquery)
+
+            return { 'status': 'success', 'deleted': delData}
 
 api.add_resource(Employees, '/employees') # Route_1
 api.add_resource(Departments, '/departments') # Route_2
